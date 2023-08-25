@@ -62,7 +62,7 @@ class _BusinessUploadState extends State<BusinessUpload> {
   Dio dio = new Dio();
 
   String url =
-      "http://167.99.186.175:3000/api/v1/business/businessInfor/upload_data/";
+      "http://mediaupload.joinchatter.ca/api/v1/business/businessInfor/upload_data/";
 
   String token = "c295f898d13b594b034f41a3ca1c66d7b3326baa";
 
@@ -81,7 +81,7 @@ class _BusinessUploadState extends State<BusinessUpload> {
             filename: "data.csv"),
       });
       dio.options.headers["Content-Type"] = "multipart/form-data";
-      dio.options.headers["Authorization"] = "Token $token";
+
       Response response = await dio.post(url, data: formData);
       if (response.statusCode == 200) {
         setState(() {
@@ -130,47 +130,8 @@ class MarkerUpload extends StatefulWidget {
 }
 
 class _MarkerUploadState extends State<MarkerUpload> {
-  bool isLoading = false;
   String text = 'select File';
-  String businessRegisterStatus = "reg";
-  String modeStatus = "dark";
   List<int> imageData = [];
-  TextEditingController controller = TextEditingController();
-
-  Dio dio = new Dio();
-
-  List<Map<String, dynamic>> businessStatus = [
-    {
-      'value': "reg",
-      "lable": "Register",
-    },
-    {
-      'value': "regS",
-      "lable": "Register Selected",
-    },
-    {
-      'value': "unreg",
-      "lable": "unregister",
-    },
-    {
-      'value': "unregS",
-      "lable": "unregister Selected",
-    },
-  ];
-  List<Map<String, dynamic>> businessmode = [
-    {
-      'value': "dark",
-      "lable": "dark Mode",
-    },
-    {
-      'value': "light",
-      "lable": "light Mode",
-    },
-  ];
-
-  String url = "http://167.99.186.175:3000/api/v1/business/marker/";
-
-  String token = "c295f898d13b594b034f41a3ca1c66d7b3326baa";
 
   void imagePickerAction() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -185,66 +146,19 @@ class _MarkerUploadState extends State<MarkerUpload> {
   void postData() async {
     String data = base64.encode(imageData);
     Clipboard.setData(ClipboardData(text: data));
+    imageData = [];
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return LoadingOverlay(
-      isLoading: isLoading,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 50),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 50),
+      child: SizedBox(
+        width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            DropdownButton<String>(
-              value: businessRegisterStatus,
-              elevation: 16,
-              onChanged: (String? value) {
-                setState(() {
-                  businessRegisterStatus = value!;
-                });
-              },
-              items: businessStatus
-                  .map<DropdownMenuItem<String>>((Map<String, dynamic> value) {
-                return DropdownMenuItem<String>(
-                  value: value['value'],
-                  child: Text(value['lable']),
-                );
-              }).toList(),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            DropdownButton<String>(
-              value: modeStatus,
-              elevation: 16,
-              onChanged: (String? value) {
-                setState(() {
-                  modeStatus = value!;
-                });
-              },
-              items: businessmode
-                  .map<DropdownMenuItem<String>>((Map<String, dynamic> value) {
-                return DropdownMenuItem<String>(
-                  value: value['value'],
-                  child: Text(value['lable']),
-                );
-              }).toList(),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            TextField(
-              controller: controller,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: "Marker Number",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
             OutlinedButton.icon(
               onPressed: imagePickerAction,
               icon: const Icon(Icons.upload),
@@ -254,10 +168,8 @@ class _MarkerUploadState extends State<MarkerUpload> {
               height: 60,
             ),
             ElevatedButton(
-                onPressed: controller.text.isEmpty && imageData.isEmpty
-                    ? null
-                    : postData,
-                child: const Text("Upload Marker"))
+                onPressed: imageData.isEmpty ? null : postData,
+                child: const Text("Copy Marker Date"))
           ],
         ),
       ),
